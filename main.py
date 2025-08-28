@@ -1,14 +1,35 @@
-from data.load import check_images, clear_data
-from data.preprocess import create_target
-from src.data.load import extract_csv
+from data.load import check_images, clear_data, extract_csv
+from data.preprocess import assign_rating, create_target
+from features.tabular import encode_categorical, scale_numeric, select_columns
+from models.train_model import train_catboost
 
 df = extract_csv()
-print(df.shape)
 df = check_images(df, 'data/raw/images/')
-print(df.shape)
 df = clear_data(df)
-print(df.shape)
-target_df = create_target(df)
-print(target_df["target"].value_counts(normalize=True))
-print(target_df['target'].describe())
-print(target_df['target'].unique())
+
+df = assign_rating(
+    df,
+    {
+        'masterCategory': ['Apparel', 'Footwear'],
+        'articleType'   : ['Shirts', 'Tshirts', 'Tops', 'Bra'],
+        'season'        : ['Summer', 'Fall'],
+        'year'          : [2019, 2018, 2017, 2014],
+        'usage'         : ['Casual', 'Sports']
+        }
+    )
+df = create_target(df, top_quantile=0.8)
+popularity = (
+    df.groupby(['masterCategory', 'articleType', 'season', 'year', 'usage', 'gender'])
+    .size()
+    .sort_values(ascending=False)
+    .head(20)
+)
+print("Top 20 popular combinations:")
+print(popularity)
+
+df = select_columns(df)
+df = scale_numeric(df)
+df = encode_categorical(df)
+print(df.head(), df.shape)
+
+model = train_catboost(df)
