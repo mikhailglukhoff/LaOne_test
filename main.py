@@ -10,22 +10,22 @@ df = clear_data(df)
 df = assign_rating(
     df,
     {
-        'masterCategory': ['Apparel', 'Footwear'],
-        'articleType'   : ['Shirts', 'Tshirts', 'Tops', 'Bra'],
+        'masterCategory': ['Apparel', 'Accessories'],
         'season'        : ['Summer', 'Fall'],
-        'year'          : [2019, 2018, 2017, 2014],
-        'usage'         : ['Casual', 'Sports']
+        'usage'         : ['Casual', 'Ethnic'],
+        'gender'        : ['Women']
         }
     )
 df = create_target(df, top_quantile=0.8)
-popularity = (
-    df.groupby(['masterCategory', 'articleType', 'season', 'year', 'usage', 'gender'])
-    .size()
-    .sort_values(ascending=False)
-    .head(20)
-)
-print("Top 20 popular combinations:")
-print(popularity)
+
+# --- Target analysis ---
+print("\n📊 Dataset size:", len(df))
+print("✅ Target distribution:")
+print(df['target'].value_counts())
+print(df['target'].value_counts(normalize=True).map(lambda x: f"{x:.2%}"))
+
+print("\n📈 Rating stats by target:")
+print(df.groupby('target')['rating'].describe())
 
 df = select_columns(df)
 df = scale_numeric(df)

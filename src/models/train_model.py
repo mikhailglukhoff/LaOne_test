@@ -28,4 +28,17 @@ def train_catboost(df: pd.DataFrame) -> CatBoostClassifier:
         )
 
     model.fit(train_pool, eval_set=val_pool, early_stopping_rounds=50)
+
+    # --- Top-10 feature importance ---
+    importances = model.get_feature_importance(train_pool, type='FeatureImportance')
+    feat_imp_df = pd.DataFrame(
+        {
+            'feature'   : X_train.columns,
+            'importance': importances
+            }
+        ).sort_values('importance', ascending=False)
+
+    print("\nTop-10 important features:")
+    print(feat_imp_df.head(10))
+
     return model

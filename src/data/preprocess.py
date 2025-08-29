@@ -4,25 +4,29 @@ import pandas as pd
 
 def assign_rating(df: pd.DataFrame, categories: dict[str, list] | None = None) -> pd.DataFrame:
     n = df.shape[0]
-    # df['rating'] = np.nan
 
-    if not categories:
-        df['rating'] = np.random.choice(np.arange(1, 5.1, 0.1), size=n)
+    # базовый рейтинг с шумом вокруг 3.0
+    df['rating'] = 3.0 + np.random.normal(0, 0.4, size=n)
 
-    else:
+    if categories:
         for col, vals in categories.items():
             idx = df[df[col].isin(vals)].index
-            df.loc[idx, 'rating'] = np.random.choice(np.arange(1, 5.1, 0.1), size=len(idx))
+            # повысим рейтинг для совпавших строк
+            df.loc[idx, 'rating'] += np.random.uniform(0.5, 1.5, size=len(idx))
 
-            # # Можно добавить назначение рейтинга для оставшихся строк, если нужно
-            # remaining_idx = df[df['rating'].isna()].index
-            # if len(remaining_idx) > 0:
-            #     df.loc[remaining_idx, 'rating'] = np.random.choice(np.arange(1, 5.1, 0.1), size=len(remaining_idx))
+            # добавим шум для лидеров (чтобы не все были "идеальными")
+            df.loc[idx, 'rating'] += np.random.normal(0, 0.3, size=len(idx))
+
+    # глобальный шум для всего датасета (моделируем случайные факторы)
+    df['rating'] += np.random.normal(0, 0.15, size=n)
+
+    # ограничим диапазон от 1 до 5
+    df['rating'] = df['rating'].clip(1, 4.9)
 
     return df
 
 
-def create_target(df: pd.DataFrame, top_quantile: float = 0.8) -> pd.DataFrame:
+def create_target(df: pd.DataFrame, top_quantile: float) -> pd.DataFrame:
     threshold = df['rating'].quantile(top_quantile)
     df['target'] = (df['rating'] >= threshold)
     return df
