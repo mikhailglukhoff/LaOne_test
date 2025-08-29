@@ -1,7 +1,7 @@
 target_col = ['target']
 
 numeric_cols = [
-    # 'year'
+    'year'
     ]
 categorical_cols = [
     'gender',
@@ -10,6 +10,5 @@ categorical_cols = [
     'articleType',
     'baseColour',
     'season',
-    'usage',
-    'year'
+    'usage'
     ]
