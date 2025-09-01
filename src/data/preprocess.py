@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from settings import IMAGES_RAW_DIR
+
 
 def assign_rating(df: pd.DataFrame, categories: dict[str, list] | None = None) -> pd.DataFrame:
     n = df.shape[0]
@@ -29,4 +31,11 @@ def assign_rating(df: pd.DataFrame, categories: dict[str, list] | None = None) -
 def create_target(df: pd.DataFrame, top_quantile: float) -> pd.DataFrame:
     threshold = df['rating'].quantile(top_quantile)
     df['target'] = (df['rating'] >= threshold)
+    return df
+
+
+def add_image_path(df: pd.DataFrame) -> pd.DataFrame:
+    df["image_path"] = df["id"].astype(str).apply(
+        lambda img_id: str(IMAGES_RAW_DIR / f"{img_id}.jpg")
+        )
     return df

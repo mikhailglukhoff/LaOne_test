@@ -1,9 +1,8 @@
-# src/features/visual.py
-from pathlib import Path
 from typing import Literal
 import torch
 from torch import nn
 from torchvision import models, transforms
+from tqdm import tqdm
 from PIL import Image
 import pandas as pd
 import numpy as np
@@ -11,7 +10,7 @@ import numpy as np
 try:
     import clip
 except ImportError:
-    clip = None  # CLIP нужно ставить отдельно, если используем
+    clip = None
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -63,10 +62,11 @@ def get_pretrained_model(model_name: Literal["resnet50", "efficientnet_b0", "cli
 
 
 def extract_image_embeddings(
-    df: pd.DataFrame, img_col: str = "image_path",
+    df: pd.DataFrame,
+    img_col: str = "image_path",
     model_name: Literal["resnet50", "efficientnet_b0", "clip"] = "resnet50",
-    batch_size: int = 32
-    ) -> pd.DataFrame:
+    batch_size: int = 32,
+) -> pd.DataFrame:
     """
     Extract embeddings for each image in df[img_col].
     Returns df with embedding columns: emb_0, emb_1, ...
@@ -75,15 +75,24 @@ def extract_image_embeddings(
     embeddings = []
 
     img_paths = df[img_col].tolist()
-    for i in range(0, len(img_paths), batch_size):
+    n_batches = (len(img_paths) + batch_size - 1) // batch_size
+
+    for i in tqdm(range(0, len(img_paths), batch_size), total=n_batches, desc="Extracting embeddings"):
         batch_paths = img_paths[i:i + batch_size]
         batch_imgs = []
 
         for path in batch_paths:
             img = Image.open(path).convert("RGB")
-            batch_imgs.append(transform(img) if model_name != "clip" else transform(img).unsqueeze(0))
+            if model_name != "clip":
+                batch_imgs.append(transform(img))
+            else:
+                batch_imgs.append(transform(img).unsqueeze(0))
 
-        batch_tensor = torch.stack(batch_imgs).to(DEVICE) if model_name != "clip" else torch.cat(batch_imgs, dim=0)
+        batch_tensor = (
+            torch.stack(batch_imgs).to(DEVICE)
+            if model_name != "clip"
+            else torch.cat(batch_imgs, dim=0).to(DEVICE)
+        )
 
         with torch.no_grad():
             if model_name == "clip":
