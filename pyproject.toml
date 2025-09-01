@@ -10,6 +10,9 @@ dependencies = [
     "tree>=0.2.4",
     "torch>=2.8.0",
     "catboost>=1.2.8",
+    "torchvision>=0.23.0",
+    "tqdm>=4.67.1",
+    "pyarrow>=21.0.0",
 ]
 
 [[tool.uv.index]]
