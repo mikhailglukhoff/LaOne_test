@@ -1,16 +1,15 @@
-from data.load import check_images, clear_data, extract_csv
-from data.preprocess import add_image_path
-from features.visual import extract_image_embeddings
-from settings import PROCESSED_DATA_DIR
+from data.extract_embeddings import extract_embeddings
+from data.load import prepare_data
+from features.cluster import cluster_embeddings
 
-df = extract_csv()
-df = check_images(df)
-df = clear_data(df)
+from models.train_models import train_combined, train_tabular, train_visual
 
-print(df.columns)
-df = add_image_path(df)
-df = extract_image_embeddings(df)
+df = prepare_data()
 
-output_file = PROCESSED_DATA_DIR / "dataset.parquet"
-df.to_parquet(output_file, index=False)
-print("✅ Embeddings extracted:", df.shape)
+extract_embeddings("dataset.parquet", force=False)
+
+train_tabular(df)
+train_visual(df)
+train_combined(df)
+
+cluster_embeddings(df, n_clusters=10, top_n=10)
