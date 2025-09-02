@@ -1,7 +1,10 @@
+from catboost import CatBoostClassifier, Pool
+from sklearn.metrics import classification_report, roc_auc_score
+from sklearn.model_selection import train_test_split
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from settings import categorical_cols, numeric_cols, target_col
+from data.load import categorical_cols, numeric_cols, target_col
 
 
 def select_columns(
@@ -35,23 +38,25 @@ def encode_categorical(
         df[col] = df[col].astype(str)
     return df
 
-import pandas as pd
-from catboost import CatBoostClassifier, Pool
-from sklearn.model_selection import train_test_split
 
-from settings import categorical_cols, MODEL_DIR, PROCESSED_DATA_DIR, target_col
-
-
-def train_catboost(df: pd.DataFrame) -> CatBoostClassifier:
-    X = df.drop(columns=target_col)
-    y = df[target_col]
+def train_catboost(
+    X: pd.DataFrame,
+    y: pd.Series,
+    categorical_cols: list[str] | None = None,
+    save_path: str | None = None,
+    ) -> CatBoostClassifier:
 
     X_train, X_val, y_train, y_val = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
         )
-
-    train_pool = Pool(X_train, y_train, cat_features=categorical_cols)
-    val_pool = Pool(X_val, y_val, cat_features=categorical_cols)
+    # print("X_train columns:", X_train.columns.tolist())
+    # print("Categorical cols:", categorical_cols)
+    if categorical_cols:
+        train_pool = Pool(X_train, y_train, cat_features=categorical_cols)
+        val_pool = Pool(X_val, y_val, cat_features=categorical_cols)
+    else:
+        train_pool = Pool(X_train, y_train)
+        val_pool = Pool(X_val, y_val)
 
     model = CatBoostClassifier(
         iterations=1000,
@@ -61,23 +66,31 @@ def train_catboost(df: pd.DataFrame) -> CatBoostClassifier:
         eval_metric="AUC",
         random_seed=42,
         class_weights=[1, 10],
-        verbose=True
+        verbose=False,
         )
 
     model.fit(train_pool, eval_set=val_pool, early_stopping_rounds=50)
 
-    # --- Top-10 feature importance ---
-    importances = model.get_feature_importance(train_pool, type='FeatureImportance')
-    feat_imp_df = pd.DataFrame(
-        {
-            'feature'   : X_train.columns,
-            'importance': importances
-            }
-        ).sort_values('importance', ascending=False)
+    # eval
+    preds = model.predict(X_val)
+    probas = model.predict_proba(X_val)[:, 1]
+    print(classification_report(y_val, preds))
+    print("ROC-AUC:", roc_auc_score(y_val, probas))
 
-    model.save_model(PROCESSED_DATA_DIR / "catboost_model.cbm")
+    # feature importance (только если не чисто эмбеддинги)
+    if categorical_cols:
+        importances = model.get_feature_importance(train_pool, type="FeatureImportance")
+        feat_imp_df = pd.DataFrame(
+            {
+                "feature"   : X_train.columns,
+                "importance": importances
+                }
+            ).sort_values("importance", ascending=False)
+        print("\nTop-10 important features:")
+        print(feat_imp_df.head(10))
 
-    print("\nTop-10 important features:")
-    print(feat_imp_df.head(10))
+    # save
+    if save_path:
+        model.save_model(save_path)
 
     return model

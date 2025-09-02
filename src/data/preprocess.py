@@ -30,7 +30,8 @@ def assign_rating(df: pd.DataFrame, categories: dict[str, list] | None = None) -
 
 def create_target(df: pd.DataFrame, top_quantile: float) -> pd.DataFrame:
     threshold = df['rating'].quantile(top_quantile)
-    df['target'] = (df['rating'] >= threshold)
+    df['target'] = (df['rating'] >= threshold).astype(int)
+    df.drop(columns=['rating'], inplace=True)
     return df
 
 
