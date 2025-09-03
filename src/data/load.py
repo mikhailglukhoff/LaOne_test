@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 from src.data.preprocess import assign_rating, create_target
-from src.settings import IMAGES_RAW_DIR, STYLES_CSV_PATH
+from src.settings import IMAGES_RAW_DIR, PROCESSED_DATA_DIR, STYLES_CSV_PATH
 
 target_col = ['target']
 
@@ -46,6 +46,7 @@ def extract_csv(path_to_csv: Path = STYLES_CSV_PATH) -> pd.DataFrame:
         csv_file = next(dataset_path.glob("*.csv"))
         STYLES_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
         IMAGES_RAW_DIR.mkdir(parents=True, exist_ok=True)
+        PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
         shutil.copy(csv_file, STYLES_CSV_PATH)
 
