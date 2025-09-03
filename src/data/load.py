@@ -44,6 +44,7 @@ def extract_csv(path_to_csv: Path = STYLES_CSV_PATH) -> pd.DataFrame:
             )
 
         csv_file = next(dataset_path.glob("*.csv"))
+        STYLES_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(csv_file, STYLES_CSV_PATH)
 
         images_folder = dataset_path / "images"
