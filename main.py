@@ -1,8 +1,8 @@
-from data.extract_embeddings import extract_embeddings
-from data.load import prepare_data
-from features.cluster import cluster_embeddings
+from src.data.extract_embeddings import extract_embeddings
+from src.data.load import prepare_data
+from src.features.cluster import cluster_embeddings
 
-from models.train_models import train_combined, train_tabular, train_visual
+from src.models.train_models import train_combined, train_tabular, train_visual
 
 df = prepare_data()
 

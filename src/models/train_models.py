@@ -2,9 +2,9 @@ import pandas as pd
 
 from catboost import CatBoostClassifier
 
-from data.load import categorical_cols, numeric_cols, target_col
-from features.tabular import train_catboost
-from settings import PROCESSED_DATA_DIR
+from src.data.load import categorical_cols, numeric_cols, target_col
+from src.features.tabular import train_catboost
+from src.settings import PROCESSED_DATA_DIR
 
 
 def train_tabular(df: pd.DataFrame) -> CatBoostClassifier:
@@ -21,7 +21,11 @@ def train_tabular(df: pd.DataFrame) -> CatBoostClassifier:
     # print("\n📈 Rating stats by target:")
     # print(df.groupby('target')['rating'].describe())
     print("Training tabular model:")
-    model = train_catboost(X, y, categorical_cols=categorical_cols, save_path="catboost_tabular_model")
+    model = train_catboost(
+        X, y,
+        categorical_cols=categorical_cols,
+        save_path=PROCESSED_DATA_DIR / "catboost_tabular_model"
+        )
     return model
 
 

@@ -6,9 +6,9 @@ from torch import nn
 from torchvision import models, transforms
 from tqdm import tqdm
 
-from data.load import prepare_data
-from data.preprocess import add_image_path
-from settings import PROCESSED_DATA_DIR
+from src.data.load import prepare_data
+from src.data.preprocess import add_image_path
+from src.settings import PROCESSED_DATA_DIR
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

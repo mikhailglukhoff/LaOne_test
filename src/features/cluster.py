@@ -1,8 +1,8 @@
 import pandas as pd
 from sklearn.cluster import KMeans
 
-from data.load import categorical_cols, numeric_cols
-from settings import PROCESSED_DATA_DIR
+from src.data.load import categorical_cols, numeric_cols
+from src.settings import PROCESSED_DATA_DIR
 
 
 def cluster_embeddings(

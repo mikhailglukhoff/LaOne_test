@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from data.preprocess import assign_rating, create_target
+from src.data.preprocess import assign_rating, create_target
 from src.settings import IMAGES_RAW_DIR, STYLES_CSV_PATH
 
 target_col = ['target']

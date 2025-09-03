@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from settings import IMAGES_RAW_DIR
+from src.settings import IMAGES_RAW_DIR
 
 
 def assign_rating(df: pd.DataFrame, categories: dict[str, list] | None = None) -> pd.DataFrame:

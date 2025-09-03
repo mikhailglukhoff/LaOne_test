@@ -1,10 +1,11 @@
+import pandas as pd
+
 from catboost import CatBoostClassifier, Pool
 from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.model_selection import train_test_split
-import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from data.load import categorical_cols, numeric_cols, target_col
+from src.data.load import categorical_cols, numeric_cols, target_col
 
 
 def select_columns(
