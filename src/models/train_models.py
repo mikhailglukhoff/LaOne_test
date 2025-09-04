@@ -12,14 +12,6 @@ def train_tabular(df: pd.DataFrame) -> CatBoostClassifier:
     X = df.drop(columns=target_col)
     y = df[target_col]
 
-    # --- Target analysis ---
-    # print("\n📊 Dataset size:", len(df))
-    # print("✅ Target distribution:")
-    # print(df['target'].value_counts())
-    # print(df['target'].value_counts(normalize=True).map(lambda x: f"{x:.2%}"))
-
-    # print("\n📈 Rating stats by target:")
-    # print(df.groupby('target')['rating'].describe())
     print("Training tabular model:")
     model = train_catboost(
         X, y,

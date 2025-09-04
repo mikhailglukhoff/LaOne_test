@@ -65,7 +65,7 @@ def train_catboost(
         eval_metric="AUC",
         random_seed=42,
         class_weights=[1, 10],
-        verbose=True,
+        verbose=False,
         )
 
     model.fit(train_pool, eval_set=val_pool, early_stopping_rounds=50)
