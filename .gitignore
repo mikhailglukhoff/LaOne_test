@@ -2,4 +2,6 @@
 data/*
 !data/.gitkeep
 !data/raw/.gitkeep
+!data/processed/
 !data/processed/.gitkeep
+!data/processed/dataset.parquet
