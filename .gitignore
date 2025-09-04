@@ -1,0 +1,5 @@
+# Ignore all data files but keep folder structure
+data/*
+!data/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
