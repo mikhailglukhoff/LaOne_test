@@ -50,8 +50,6 @@ def train_catboost(
     X_train, X_val, y_train, y_val = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
         )
-    # print("X_train columns:", X_train.columns.tolist())
-    # print("Categorical cols:", categorical_cols)
     if categorical_cols:
         train_pool = Pool(X_train, y_train, cat_features=categorical_cols)
         val_pool = Pool(X_val, y_val, cat_features=categorical_cols)
@@ -67,7 +65,7 @@ def train_catboost(
         eval_metric="AUC",
         random_seed=42,
         class_weights=[1, 10],
-        verbose=False,
+        verbose=True,
         )
 
     model.fit(train_pool, eval_set=val_pool, early_stopping_rounds=50)
